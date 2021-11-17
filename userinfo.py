@@ -16,6 +16,7 @@ db_collection.insert_many(file_data)
 
 client.close()
 
+# print(db_collection.count())
 
 find1 = db_collection.find({"$and":[{"dob.age":{"$gt":50}},{"location.city":"گلستان"}]}, {"name.first":1, "name.last":1, "_id":0}) #OK
 #for i in find1:
@@ -72,9 +73,32 @@ find6 = db_collection.aggregate([{'$group':{'_id' :"$location.city",'avg_age':{'
 # for i in find6:
 #     pprint(i)
 
+# find6 second way :
+find6_b = db_collection.aggregate([{'$addFields':{"city_group":{'$cond':[{'$eq': ["$location.city","تهران"]}, "Tehran", "Other_Cities"]}}}, {'$group':{'_id':"$city_group", 'compare_avg_age':{'$avg':"$dob.age"}}}])
+
+# for i in find6_b:
+#      print(i)
+
+
 
 find7=db_collection.aggregate([{'$project' : {'_id':0,"name.first":1,"name.last":1,"youth":{'$lt':["$dob.age" , 16]},"middle_aged":{'$and':[{'$gt':["$dob.age",16]},{'$lt':["$dob.age",40]}]},"old":{'$gt':["$dob.age",40]}}}])
 
 # for i in find7:
 #      print(i)
+
+
+
+
+# Unfortunately, i couldn't handle this part :(
+db = client['information']
+new_collection = db['info']
+# print(new_collection.count())  # first it gave 0 
+
+# new_collection.insert_many(file_data)
+# print(new_collection.count())
+
+
+
+# # count = new_collection.aggregate([{"$count":"Total documents"}])
+# # print(count)
 
